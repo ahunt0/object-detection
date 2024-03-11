@@ -13,8 +13,16 @@ def find_xo(img, needle, name):
     print(f"{name}: {int(max_val * 100)}%, {max_loc}")
     w = needle.shape[1]
     h = needle.shape[0]
-    cv2.rectangle(img, max_loc, (max_loc[0] + w, max_loc[1] + h), (0, 255, 0), 2)
-    cv2.putText(img, f'\"{name}\" {int(max_val * 100)}%', (max_loc[0] - 5, max_loc[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+    threshold = 0.8
+    yloc, xloc = np.where(result >= threshold)
+    rectangles = []
+    for (x, y) in zip(xloc, yloc):
+        rectangles.append([int(x), int(y), int(w), int(h)])
+        rectangles.append([int(x), int(y), int(w), int(h)])
+    rectangles, weights = cv2.groupRectangles(rectangles, 1, 0.2)
+    for (x, y, w, h) in rectangles:
+        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.putText(img, f'\"{name}\" {int(max_val * 100)}%', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
     cv2.waitKey()
     cv2.destroyAllWindows()
 
