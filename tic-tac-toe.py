@@ -2,10 +2,19 @@ import cv2
 import numpy as np
 import pyautogui
 import mss
+from time import sleep
+import keyboard
 
 sct = mss.mss()
 
-board_img = np.array(sct.grab({"top": 330, "left": 700, "width": 530, "height": 530}))
+dimensions = {
+    "top": 330,
+    "left": 700,
+    "width": 530,
+    "height": 530
+}
+
+# board_img = np.array(sct.grab({"top": 330, "left": 700, "width": 530, "height": 530}))
 o_img = cv2.imread('./images/o_needle.png', cv2.IMREAD_UNCHANGED)
 x_img = cv2.imread('./images/x_needle.png', cv2.IMREAD_UNCHANGED)
 blank_img = cv2.imread('./images/blank_needle.png', cv2.IMREAD_UNCHANGED)
@@ -71,6 +80,12 @@ def find(board, needle):
         # Convert the grid cell coordinates to a number from 1 to 9
         position = grid_y * 3 + grid_x + 1
 
+        # if position is already taken overwrite it
+        for piece in pieces:
+            if piece.position == position:
+                pieces.remove(piece)
+                break
+
         pieces.append(Piece(needle, x, y, position)) # Add the piece to the list of pieces
 
         # print(f"    @ {center_x}, {center_y}, position: {position}")
@@ -86,14 +101,24 @@ def find(board, needle):
         # Draw a rectangle around the rectangles
         cv2.rectangle(board, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
+while True:
+    board_img = np.array(sct.grab(dimensions))
+    find(board_img, blank_img)
+    find(board_img, x_img)
+    find(board_img, o_img)
+    cv2.imshow('Board', board_img)
+    cv2.waitKey(1)
+    sleep(.10)
+    if keyboard.is_pressed('q'):
+        break
 
-find(board_img, blank_img)
-find(board_img, x_img)
-find(board_img, o_img)
+# find(board_img, blank_img)
+# find(board_img, x_img)
+# find(board_img, o_img)
 
-for piece in pieces:
-    print(f"Piece: {piece.img} @ {piece.x}, {piece.y}, position: {piece.position}")
+# for piece in pieces:
+#     print(f"Piece: {piece.img}\n    @ {piece.x}, {piece.y}, position: {piece.position}")
 
-cv2.imshow('Board', board_img)
-cv2.waitKey()
-cv2.destroyAllWindows()
+# cv2.imshow('Board', board_img)
+# cv2.waitKey()
+# cv2.destroyAllWindows()
