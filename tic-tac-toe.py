@@ -44,10 +44,10 @@ def game_state(board):
     # Check for game start
     if x_count + o_count == 0:
         return "Game not started", None
-    elif x_count > o_count:
-        return "Game in progress", "O"
-    else:
+    elif o_count > x_count:
         return "Game in progress", "X"
+    else:
+        return "Game in progress", "O"
     
 
 def find(board, needle):
