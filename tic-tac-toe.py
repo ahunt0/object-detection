@@ -87,8 +87,6 @@ def find(board, needle):
 
         pieces.append(Piece(needle, x, y, position)) # Add the piece to the list of pieces
 
-        # print(f"    @ {center_x}, {center_y}, position: {position}")
-
         # Label the rectangles
         if needle is x_img:
             cv2.putText(board, 'X', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
@@ -97,7 +95,7 @@ def find(board, needle):
         else:
             cv2.putText(board, 'Blank', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
-        cv2.putText(board, f"{position}", (grid_x * grid_width, grid_y * grid_height + 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+        cv2.putText(board, f"{position}", (grid_x * grid_width + 5, grid_y * grid_height + 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
         
         # Draw a rectangle around the rectangles
         cv2.rectangle(board, (x, y), (x + w, y + h), (0, 255, 0), 2)
