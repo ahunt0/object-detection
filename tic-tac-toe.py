@@ -14,7 +14,6 @@ dimensions = {
     "height": 530
 }
 
-# board_img = np.array(sct.grab({"top": 330, "left": 700, "width": 530, "height": 530}))
 o_img = cv2.imread('./images/o_needle.png', cv2.IMREAD_UNCHANGED)
 x_img = cv2.imread('./images/x_needle.png', cv2.IMREAD_UNCHANGED)
 blank_img = cv2.imread('./images/blank_needle.png', cv2.IMREAD_UNCHANGED)
@@ -97,6 +96,8 @@ def find(board, needle):
             cv2.putText(board, 'O', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
         else:
             cv2.putText(board, 'Blank', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+
+        cv2.putText(board, f"{position}", (grid_x * grid_width, grid_y * grid_height + 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
         
         # Draw a rectangle around the rectangles
         cv2.rectangle(board, (x, y), (x + w, y + h), (0, 255, 0), 2)
@@ -111,14 +112,3 @@ while True:
     sleep(.10)
     if keyboard.is_pressed('q'):
         break
-
-# find(board_img, blank_img)
-# find(board_img, x_img)
-# find(board_img, o_img)
-
-# for piece in pieces:
-#     print(f"Piece: {piece.img}\n    @ {piece.x}, {piece.y}, position: {piece.position}")
-
-# cv2.imshow('Board', board_img)
-# cv2.waitKey()
-# cv2.destroyAllWindows()
