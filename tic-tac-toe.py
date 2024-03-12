@@ -7,9 +7,10 @@ import keyboard
 
 sct = mss.mss()
 
+mon = sct.monitors[1]
 dimensions = {
-    "top": 330,
-    "left": 700,
+    "top": mon['top'] + 330,
+    "left": mon['left'] + 700,
     "width": 530,
     "height": 530
 }
@@ -35,11 +36,25 @@ class Piece:
 
 pieces = []
 
+def game_state(board):
+    # Count the number of X and O pieces
+    x_count = sum(piece.img == "X" for piece in board)
+    o_count = sum(piece.img == "O" for piece in board)
+
+    # Check for game start
+    if x_count + o_count == 0:
+        return "Game not started", None
+    elif x_count > o_count:
+        return "Game in progress", "O"
+    else:
+        return "Game in progress", "X"
+    
+
 def find(board, needle):
     result = cv2.matchTemplate(board, needle, cv2.TM_CCOEFF_NORMED)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result) # min = worst match, max = best match
     
-    threshold = 0.8
+    threshold = 0.7 # If you're not getting matches try lowering this value
     
     # Find the locations of the best matches
     yloc, xloc = np.where(result >= threshold)
@@ -108,5 +123,7 @@ while True:
     cv2.imshow('Board', board_img)
     cv2.waitKey(1)
     sleep(.10)
+    print(f"Game state: {game_state(pieces)[0]}")
+    print(f"Turn: {game_state(pieces)[1]}")
     if keyboard.is_pressed('q'):
         break
