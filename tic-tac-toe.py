@@ -1,35 +1,81 @@
 import cv2
 import numpy as np
 
-board_img = cv2.imread('board.png', cv2.IMREAD_UNCHANGED)
-board2_img = cv2.imread('board2.png', cv2.IMREAD_UNCHANGED)
-o_img = cv2.imread('o_needle.png', cv2.IMREAD_UNCHANGED)
-x_img = cv2.imread('x_needle.png', cv2.IMREAD_UNCHANGED)
-blank_img = cv2.imread('blank_needle.png', cv2.IMREAD_UNCHANGED)
+board_img = cv2.imread('./images/board.png', cv2.IMREAD_UNCHANGED) # 530x550
+o_img = cv2.imread('./images/o_needle.png', cv2.IMREAD_UNCHANGED)
+x_img = cv2.imread('./images/x_needle.png', cv2.IMREAD_UNCHANGED)
+blank_img = cv2.imread('./images/blank_needle.png', cv2.IMREAD_UNCHANGED)
 
-def find_xo(img, needle, name):
-    result = cv2.matchTemplate(img, needle, cv2.TM_CCOEFF_NORMED)
-    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-    print(f"{name}: {int(max_val * 100)}%, {max_loc}")
-    w = needle.shape[1]
-    h = needle.shape[0]
+def image_type(img):
+    if img is x_img:
+        return "X"
+    elif img is o_img:
+        return "O"
+    else:
+        return "Blank"
+
+def find(board, needle):
+    result = cv2.matchTemplate(board, needle, cv2.TM_CCOEFF_NORMED)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result) # min = worst match, max = best match
+    
     threshold = 0.8
+    
+    # Find the locations of the best matches
     yloc, xloc = np.where(result >= threshold)
+
     rectangles = []
+
     for (x, y) in zip(xloc, yloc):
-        rectangles.append([int(x), int(y), int(w), int(h)])
-        rectangles.append([int(x), int(y), int(w), int(h)])
+        rectangles.append([int(x), int(y), int(needle.shape[1]), int(needle.shape[0])])
+        rectangles.append([int(x), int(y), int(needle.shape[1]), int(needle.shape[0])])
+
+    # Group rectangles to avoid duplicates
     rectangles, weights = cv2.groupRectangles(rectangles, 1, 0.2)
+
+    print(f"{image_type(needle)} count: {len(rectangles)}")
+
+    # Calculate the grid cell size
+    grid_width = board.shape[1] // 3
+    grid_height = board.shape[0] // 3
+
+    # Draw grid lines for debugging
+    for i in range(3):
+        for j in range(3):
+            cv2.rectangle(board, (i * grid_width, j * grid_height), ((i + 1) * grid_width, (j + 1) * grid_height), (0, 255, 0), 2)
+    
     for (x, y, w, h) in rectangles:
-        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        cv2.putText(img, f'\"{name}\" {int(max_val * 100)}%', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
+        # Calculate the center of the rectangle
+        center_x = x + w // 2
+        center_y = y + h // 2
 
-find_xo(board2_img, o_img, 'O')
-find_xo(board2_img, x_img, 'X')
-find_xo(board2_img, blank_img, 'Blank')
+        # Draw the center of the rectangle
+        cv2.circle(board, (center_x, center_y), 5, (0, 0, 255), -1)
 
-cv2.imshow('Board2', board2_img)
+        # Calculate the grid cell coordinates
+        grid_x = center_x // grid_width
+        grid_y = center_y // grid_height
+
+        # Convert the grid cell coordinates to a number from 1 to 9
+        position = grid_y * 3 + grid_x + 1
+
+        print(f"    @ {center_x}, {center_y}, position: {position}")
+
+        # Label the rectangles
+        if needle is x_img:
+            cv2.putText(board, 'X', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+        elif needle is o_img:
+            cv2.putText(board, 'O', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+        else:
+            cv2.putText(board, 'Blank', (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+        
+        # Draw a rectangle around the rectangles
+        cv2.rectangle(board, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+
+find(board_img, blank_img)
+find(board_img, x_img)
+find(board_img, o_img)
+
+cv2.imshow('Board', board_img)
 cv2.waitKey()
 cv2.destroyAllWindows()
