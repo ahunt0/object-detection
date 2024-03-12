@@ -13,6 +13,15 @@ def image_type(img):
         return "O"
     else:
         return "Blank"
+    
+class Piece:
+    def __init__(self, img, x, y, position):
+        self.img = image_type(img)
+        self.x = x
+        self.y = y
+        self.position = position
+
+pieces = []
 
 def find(board, needle):
     result = cv2.matchTemplate(board, needle, cv2.TM_CCOEFF_NORMED)
@@ -58,7 +67,9 @@ def find(board, needle):
         # Convert the grid cell coordinates to a number from 1 to 9
         position = grid_y * 3 + grid_x + 1
 
-        print(f"    @ {center_x}, {center_y}, position: {position}")
+        pieces.append(Piece(needle, x, y, position)) # Add the piece to the list of pieces
+
+        # print(f"    @ {center_x}, {center_y}, position: {position}")
 
         # Label the rectangles
         if needle is x_img:
@@ -75,6 +86,9 @@ def find(board, needle):
 find(board_img, blank_img)
 find(board_img, x_img)
 find(board_img, o_img)
+
+for piece in pieces:
+    print(f"Piece: {piece.img} @ {piece.x}, {piece.y}, position: {piece.position}")
 
 cv2.imshow('Board', board_img)
 cv2.waitKey()
