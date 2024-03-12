@@ -1,7 +1,11 @@
 import cv2
 import numpy as np
+import pyautogui
+import mss
 
-board_img = cv2.imread('./images/board.png', cv2.IMREAD_UNCHANGED) # 530x550
+sct = mss.mss()
+
+board_img = np.array(sct.grab({"top": 330, "left": 700, "width": 530, "height": 530}))
 o_img = cv2.imread('./images/o_needle.png', cv2.IMREAD_UNCHANGED)
 x_img = cv2.imread('./images/x_needle.png', cv2.IMREAD_UNCHANGED)
 blank_img = cv2.imread('./images/blank_needle.png', cv2.IMREAD_UNCHANGED)
