@@ -23,9 +23,9 @@ game = Game(dimensions)
 
 while True:
     board = np.array(sct.grab(dimensions))
-    game.scan_board(board, o_needle)
-    game.scan_board(board, x_needle)
-    game.scan_board(board, blank_needle)
+    game.scan_board(board, o_needle, "O")
+    game.scan_board(board, x_needle, "X")
+    game.scan_board(board, blank_needle, "Blank")
     if keyboard.is_pressed("q"):
         break
     cv2.imshow("Board", board)

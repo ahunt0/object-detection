@@ -25,7 +25,7 @@ class Game:
         
         return self.game_state
 
-    def scan_board(self, board, needle):
+    def scan_board(self, board, needle, piece_type):
         """
         Scan the board for pieces and update the game state.
 
@@ -70,9 +70,10 @@ class Game:
                     break
 
             # Add the piece to the pieces list
-            found_piece = Piece(x, y, w, h, cell, needle)
+            found_piece = Piece(x, y, w, h, cell, piece_type)
             self.pieces.append(found_piece)
-            print(f"Found {Piece.image_type(found_piece, needle)} at {cell}")
+            print(f"found_piece: {found_piece.x, found_piece.y, found_piece.w, found_piece.h, found_piece.cell, found_piece.symbol}")
+            # print(f"Found {found_piece, needle} at {cell}")
 
         # label the board
         for piece in self.pieces:
