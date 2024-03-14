@@ -10,6 +10,15 @@ class Game:
         self.game_state = "Game not started"
         self.turn = "O"
 
+    def is_game_over(self, board, new_game_needle):
+        result = cv2.matchTemplate(board, new_game_needle, cv2.TM_CCOEFF_NORMED)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+        threshold = 0.7
+        if max_val >= threshold:
+            return True
+        return False
+
+
     def get_game_state(self):
         # Count the number of X and O pieces
         x_count = sum(piece.symbol == "X" for piece in self.pieces)
@@ -20,8 +29,10 @@ class Game:
             self.game_state = "Game not started"
         elif o_count > x_count:
             self.game_state = "Game in progress"
+            self.turn = "X"
         else:
             self.game_state = "Game in progress"
+            self.turn = "O"
         
         return self.game_state
 
@@ -32,7 +43,7 @@ class Game:
         :param board: The board image to scan.
         """
         # Clear the pieces list
-        self.pieces.clear()
+        # self.pieces.clear()
 
         result = cv2.matchTemplate(board, needle, cv2.TM_CCOEFF_NORMED)
 
@@ -61,7 +72,7 @@ class Game:
 
         for(x, y, w, h) in rectangles:
             # Calculate the cell position
-            cell = (x // cell_w, y // cell_h)
+            cell = ( y // cell_h, x // cell_w)
 
             # If the cell is already occupied, overwrite the piece
             for piece in self.pieces:
@@ -72,7 +83,7 @@ class Game:
             # Add the piece to the pieces list
             found_piece = Piece(x, y, w, h, cell, piece_type)
             self.pieces.append(found_piece)
-            print(f"found_piece: {found_piece.x, found_piece.y, found_piece.w, found_piece.h, found_piece.cell, found_piece.symbol}")
+            # print(f"found_piece: {found_piece.x, found_piece.y, found_piece.w, found_piece.h, found_piece.cell, found_piece.symbol}")
             # print(f"Found {found_piece, needle} at {cell}")
 
         # label the board
